@@ -1,0 +1,29 @@
+name: Test basic usage - submit URL to Wayback Machine
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          url: 'https://example.com'
+          saveErrors: 'true'
+          saveOutlinks: 'false'
+          saveScreenshot: 'false'
+      - name: Assert wayback_url output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.wayback_url }}
+        run: |
+          echo "actual wayback_url: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: wayback_url output is empty"
+            exit 1
+          fi
+          if [[ "$ACTUAL" != *"web.archive.org"* ]]; then
+            echo "FAIL: wayback_url does not contain 'web.archive.org'"
+            exit 1
+          fi
+          echo "PASS: wayback_url=$ACTUAL"
