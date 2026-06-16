@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json"
+  ],
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "sourceMap": true,
+    "types": [
+      "vitest/globals"
+    ]
+  },
+}

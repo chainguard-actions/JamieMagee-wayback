@@ -1,0 +1,133 @@
+import * as core from '@actions/core';
+import type Input from './input';
+import type { SaveStatus } from './types';
+import log from './utils/logger';
+
+export default class WayBack {
+  private static readonly baseWaybackUrl = 'https://web.archive.org/save';
+  private static readonly statusGuidRegex =
+    /watchJob\("(?<guid>[0-9nps]{4}-[0-9a-f]{40})/;
+  private saveErrors: boolean;
+  private saveOutlinks: boolean;
+  private saveScreenshot: boolean;
+
+  constructor(input: Input) {
+    this.saveErrors = input.saveErrors;
+    this.saveOutlinks = input.saveOutlinks;
+    this.saveScreenshot = input.saveScreenshot;
+  }
+
+  public async save(url: string): Promise<void> {
+    const requestUrl = `${WayBack.baseWaybackUrl}/${url}`;
+    const form = new FormData();
+    form.append('url', url);
+    if (this.saveErrors) {
+      form.append('capture_all', 'on');
+    }
+    if (this.saveOutlinks) {
+      form.append('capture_outlinks', 'on');
+    }
+    if (this.saveScreenshot) {
+      form.append('capture_screenshot', 'on');
+    }
+
+    try {
+      const res = await fetch(requestUrl, {
+        method: 'POST',
+        body: form,
+        headers: {
+          'User-Agent': 'https://github.com/JamieMagee/wayback',
+        },
+      });
+
+      if (!res.ok) {
+        await this.handleErrorResponse(res);
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const responseText = await res.text();
+      const match = WayBack.statusGuidRegex.exec(responseText);
+      if (match?.groups?.['guid']) {
+        const guid = match.groups?.['guid'];
+        const saveStatus = await this.pollStatus(guid);
+        this.handleStatusResponse(saveStatus);
+      } else {
+        log.error('Unable to fetch status');
+        throw new Error('Unable to fetch status');
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        log.error(err.message);
+      }
+      throw err;
+    }
+  }
+
+  private async handleErrorResponse(response: Response): Promise<void> {
+    const error: string | undefined =
+      response.headers.get('x-archive-wayback-runtime-error') ?? undefined;
+    if (error) {
+      switch (error) {
+        case 'AdministrativeAccessControlException':
+          log.error('This site is excluded from the Wayback Machine.');
+          break;
+        case 'RobotAccessControlException':
+          log.error('Blocked by robots.txt.');
+          break;
+        case 'LiveDocumentNotAvailableException':
+        case 'LiveWebCacheUnavailableException':
+          log.error('Unable to archive page. Try again later.');
+          break;
+        default:
+          log.error('An unknown error occurred.', error);
+      }
+    }
+  }
+
+  private handleStatusResponse(saveStatus: SaveStatus): void {
+    switch (saveStatus.status) {
+      case 'success':
+        log.info(this.getArchiveUrl(saveStatus));
+        break;
+      default:
+        log.debug(saveStatus);
+    }
+  }
+
+  private async pollStatus(guid: string): Promise<SaveStatus> {
+    let saveStatus = await this.getSaveStatus(guid);
+    while (saveStatus.status === 'pending') {
+      await this.sleep(2000);
+      saveStatus = await this.getSaveStatus(guid);
+    }
+    return saveStatus;
+  }
+
+  private async getSaveStatus(guid: string): Promise<SaveStatus> {
+    try {
+      const response = await fetch(`${WayBack.baseWaybackUrl}/status/${guid}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return (await response.json()) as SaveStatus;
+    } catch (err) {
+      if (err instanceof Error) {
+        log.error(err.message);
+      }
+      throw err;
+    }
+  }
+
+  private async sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private getArchiveUrl(saveStatus: SaveStatus): string | undefined {
+    // original_url is present when status === 'success'
+    const archiveUrl = `https://web.archive.org/web/${saveStatus.timestamp}/${saveStatus.original_url}`;
+    core.setOutput('wayback_url', archiveUrl);
+    return archiveUrl;
+  }
+}
