@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | v1.3.51 | [`v1.3.51`](https://github.com/chainguard-actions/JamieMagee-wayback/tree/v1.3.51) | [`45831b2`](https://github.com/JamieMagee/wayback/commit/45831b22967b2702ee681e1e5f6c90e772eb4b41) |
+| v2.0.1 | [`v2.0.1`](https://github.com/chainguard-actions/JamieMagee-wayback/tree/v2.0.1) | [`7d593b9`](https://github.com/JamieMagee/wayback/commit/7d593b95a76fbc2a18e1340f38bd296447e923d3) |
 | v2.1.0 | [`v2.1.0`](https://github.com/chainguard-actions/JamieMagee-wayback/tree/v2.1.0) | [`cb9c732`](https://github.com/JamieMagee/wayback/commit/cb9c732c93e9c0221956a78557702c0b5cc9a211) |
 | v2.2.0 | [`v2.2.0`](https://github.com/chainguard-actions/JamieMagee-wayback/tree/v2.2.0) | [`e561c50`](https://github.com/JamieMagee/wayback/commit/e561c5018fb0e62988fddd732fb88345a3faa608) |
 
