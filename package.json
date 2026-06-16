@@ -1,0 +1,29 @@
+{
+  "name": "wayback",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JamieMagee/wayback.git"
+  },
+  "author": "Jamie Magee <jamie.magee@gmail.com>",
+  "scripts": {
+    "build": "node esbuild.mjs --production",
+    "build:dev": "node esbuild.mjs",
+    "test": "vitest run",
+    "lint": "biome check ./src"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.12",
+    "@tsconfig/node-ts": "23.6.4",
+    "@tsconfig/node24": "24.0.4",
+    "@tsconfig/strictest": "2.0.8",
+    "@types/node": "24.12.2",
+    "esbuild": "0.28.0",
+    "nock": "14.0.12",
+    "typescript": "6.0.2",
+    "vitest": "4.1.4"
+  }
+}

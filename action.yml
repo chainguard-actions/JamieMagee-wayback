@@ -1,0 +1,42 @@
+name: 'Wayback Machine'
+description: 'Action for submitting a website to the Wayback Machine'
+author: 'Jamie Magee'
+branding:
+  icon: 'clock'
+  color: 'red'
+inputs:
+  url:
+    required: false
+    description: 'Optional URL to submit to the Wayback Machine. If not provided, the action will attempt to detect it from a CNAME file in the repository.'
+  saveErrors:
+    required: false
+    default: 'true'
+    description: 'If true, save HTTP errors as well'
+  saveOutlinks:
+    required: false
+    default: 'false'
+    description: 'If true, save all links to external sites'
+  saveScreenshot:
+    required: false
+    default: 'false'
+    description: 'If true, save a screenshot of the site'
+  skipFirstArchive:
+    required: false
+    default: 'false'
+    description: 'If true, skip the check for whether this is the first capture of the URL. Makes captures faster.'
+  ifNotArchivedWithin:
+    required: false
+    description: 'Only capture the URL if the most recent existing capture is older than this. Accepts SPN2 timedelta strings (e.g. "1d", "3h 20m") or seconds. Supports a comma-separated pair to apply a different value to outlinks.'
+outputs:
+  wayback_url:
+    description: 'The Wayback Machine URL of the last successful capture in the run.'
+  wayback_urls:
+    description: 'Newline-separated list of Wayback Machine URLs for every successful capture in the run.'
+  screenshot_url:
+    description: 'The screenshot URL of the last successful capture (when saveScreenshot is true).'
+  screenshot_urls:
+    description: 'Newline-separated list of screenshot URLs for every capture that produced one.'
+runs:
+  using: 'node24'
+  main: 'dist/index.mjs'
+  pre: chainguard-phonehome.js
