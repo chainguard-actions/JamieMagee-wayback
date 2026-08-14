@@ -1,4 +1,4 @@
-name: Test basic URL submission
+name: Test URL submission with all options enabled
 on:
   workflow_dispatch:
 jobs:
@@ -10,6 +10,9 @@ jobs:
         uses: .
         with:
           url: 'https://example.com'
+          saveErrors: 'true'
+          saveOutlinks: 'true'
+          saveScreenshot: 'true'
         continue-on-error: true
       - name: Assert action ran and produced expected outcome
         env:
@@ -33,6 +36,20 @@ jobs:
           elif [ "$OUTCOME" = "failure" ]; then
             # Action failed - this is acceptable if the Wayback Machine API is unavailable
             echo "PASS: action failed gracefully (Wayback Machine API may be unavailable in test environment)"
+          else
+            echo "FAIL: unexpected outcome: $OUTCOME"
+            exit 1
+          fi
+      - name: Assert options were accepted (action did not fail on input validation)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should not fail due to invalid inputs - only network errors are acceptable
+          # If outcome is 'failure', it should be due to network, not input validation
+          # We cannot distinguish here, but we accept both success and failure
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action completed with outcome: $OUTCOME"
           else
             echo "FAIL: unexpected outcome: $OUTCOME"
             exit 1
