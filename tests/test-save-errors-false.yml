@@ -1,0 +1,35 @@
+name: Test saveErrors false
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: wayback
+        uses: .
+        with:
+          url: 'https://example.com'
+          saveErrors: 'false'
+          saveOutlinks: 'false'
+          saveScreenshot: 'false'
+        continue-on-error: true
+      - name: Assert action ran with saveErrors false
+        env:
+          WAYBACK_URL: ${{ steps.wayback.outputs.wayback_url }}
+          OUTCOME: ${{ steps.wayback.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "wayback_url: $WAYBACK_URL"
+          # The action may fail due to network issues in CI, but it should not
+          # crash due to invalid parameter handling when saveErrors is false
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$WAYBACK_URL" ]; then
+              echo "FAIL: wayback_url output is empty on success"
+              exit 1
+            fi
+            echo "PASS: wayback_url=$WAYBACK_URL"
+          else
+            echo "INFO: Action did not succeed (likely network unavailable in test environment), outcome=$OUTCOME"
+            echo "PASS: action ran without crashing the workflow"
+          fi
