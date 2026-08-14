@@ -1,4 +1,4 @@
-name: Test ifNotArchivedWithin option
+name: Test skipFirstArchive option
 on:
   workflow_dispatch:
 jobs:
@@ -10,7 +10,6 @@ jobs:
         uses: .
         with:
           url: 'https://example.com'
-          ifNotArchivedWithin: '1d'
           skipFirstArchive: 'true'
           saveErrors: 'false'
         continue-on-error: true

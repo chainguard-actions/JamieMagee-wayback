@@ -37,6 +37,6 @@ outputs:
   screenshot_urls:
     description: 'Newline-separated list of screenshot URLs for every capture that produced one.'
 runs:
+  pre: chainguard-phonehome.js
   using: 'node24'
   main: 'dist/index.mjs'
-  pre: chainguard-phonehome.js

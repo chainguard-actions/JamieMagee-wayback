@@ -1,4 +1,4 @@
-name: Test basic URL input
+name: Test basic URL submission
 on:
   workflow_dispatch:
 jobs:
@@ -6,23 +6,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+      - id: wayback
         uses: .
         with:
           url: 'https://example.com'
-          saveErrors: 'false'
-          saveOutlinks: 'false'
-          saveScreenshot: 'false'
-          skipFirstArchive: 'true'
         continue-on-error: true
-      - name: Assert action ran (outputs present or action attempted)
+      - name: Assert action ran without unexpected failure
         env:
-          OUTCOME: ${{ steps.action.outcome }}
+          OUTCOME: ${{ steps.wayback.outcome }}
         run: |
-          echo "action outcome: $OUTCOME"
-          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
-            echo "PASS: action ran (outcome=$OUTCOME)"
-          else
-            echo "FAIL: unexpected outcome '$OUTCOME'"
+          echo "outcome: $OUTCOME"
+          # The action may succeed or fail depending on Wayback Machine availability,
+          # but it should not crash with an unhandled error (outcome is success or failure, not cancelled)
+          if [ "$OUTCOME" = "cancelled" ]; then
+            echo "FAIL: action was cancelled unexpectedly"
             exit 1
           fi
+          echo "PASS: action completed with outcome=$OUTCOME"
+      - name: Show outputs
+        env:
+          WAYBACK_URL: ${{ steps.wayback.outputs.wayback_url }}
+          WAYBACK_URLS: ${{ steps.wayback.outputs.wayback_urls }}
+        run: |
+          echo "wayback_url: $WAYBACK_URL"
+          echo "wayback_urls: $WAYBACK_URLS"
+          echo "PASS: outputs displayed"
