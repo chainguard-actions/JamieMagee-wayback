@@ -1,4 +1,4 @@
-name: Test basic usage
+name: Test with saveErrors disabled
 on:
   workflow_dispatch:
 jobs:
@@ -10,6 +10,9 @@ jobs:
         uses: .
         with:
           url: 'https://example.com'
+          saveErrors: 'false'
+          saveOutlinks: 'false'
+          saveScreenshot: 'false'
         continue-on-error: true
       - name: Assert wayback_url format if set
         env:

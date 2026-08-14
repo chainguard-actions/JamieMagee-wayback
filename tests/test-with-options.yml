@@ -1,4 +1,4 @@
-name: Test basic usage
+name: Test with optional parameters
 on:
   workflow_dispatch:
 jobs:
@@ -10,6 +10,9 @@ jobs:
         uses: .
         with:
           url: 'https://example.com'
+          saveErrors: 'true'
+          saveOutlinks: 'true'
+          saveScreenshot: 'true'
         continue-on-error: true
       - name: Assert wayback_url format if set
         env:

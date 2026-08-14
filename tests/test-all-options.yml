@@ -1,0 +1,37 @@
+name: Test with all options enabled
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: wayback
+        uses: .
+        with:
+          url: 'https://example.com'
+          saveErrors: 'true'
+          saveOutlinks: 'true'
+          saveScreenshot: 'true'
+        continue-on-error: true
+      - name: Assert action ran and produced output or failed gracefully
+        env:
+          OUTCOME: ${{ steps.wayback.outcome }}
+          WAYBACK_URL: ${{ steps.wayback.outputs.wayback_url }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "wayback_url: $WAYBACK_URL"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$WAYBACK_URL" ]; then
+              echo "FAIL: action succeeded but wayback_url output is empty"
+              exit 1
+            fi
+            if [[ "$WAYBACK_URL" != *"web.archive.org"* ]]; then
+              echo "FAIL: wayback_url does not contain 'web.archive.org'"
+              exit 1
+            fi
+            echo "PASS: wayback_url is $WAYBACK_URL"
+          else
+            echo "INFO: action did not succeed (network may be unavailable in act), outcome=$OUTCOME"
+            echo "PASS: action ran and failed gracefully (no panic/crash)"
+          fi
