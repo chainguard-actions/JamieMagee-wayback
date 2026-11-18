@@ -4,8 +4,13 @@
   "version": "v2.0.1",
   "commit_sha": "7d593b95a76fbc2a18e1340f38bd296447e923d3",
   "url": "https://github.com/JamieMagee/wayback",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/JamieMagee/wayback/v2.0.1/sha256-90c051007b40eb2dfef638111215d63a07e722b73abcf3138ee3b23525de78da.tar.gz",
+    "sha256": "90c051007b40eb2dfef638111215d63a07e722b73abcf3138ee3b23525de78da",
+    "size_bytes": 148825
+  }
 }
